@@ -43,15 +43,38 @@ function PredictionHistory() {
 // Styled Components
 
 const HistoryContainer = styled.div`
-  padding: 30px 40px;
+  // padding: 30px 40px;
   max-width: 800px;
-  margin: auto;
+  height: 85vh;
+  overflow-y: auto;
+  margin: 40px auto 20px auto; /* Add top margin */
   color: #222260;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ 
 
   h2 {
     color: rgb(74, 36, 165);
     margin-bottom: 20px;
+    position: sticky;
+    top: 0;
+    background-color: #f6e8ff;
+    padding: 10px 8px;
+    z-index: 1;
+    // border-radius : 5px;
+  }
+
+  /* Optional: Smooth scrollbar */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    // background-color: rgba(74, 36, 165, 0.4);
+    border-radius: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
   }
 `;
 

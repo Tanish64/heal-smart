@@ -68,6 +68,7 @@ function BlogApp() {
     <Container>
       <Heading>Create Blog</Heading>
       <Form onSubmit={createBlog}>
+        
         <Input
           type="text"
           placeholder="Title"
@@ -155,10 +156,10 @@ const Container = styled.div`
 `;
 
 const Heading = styled.h2`
-  font-weight: 700;
-  font-size: 1.875rem;
+  font-weight: 800;
+  font-size: 2.5rem;
   margin-bottom: 1.5rem;
-  color: #6b21a8;
+  color: #553C9A;
 `;
 
 const Form = styled.form`
@@ -177,8 +178,8 @@ const Input = styled.input`
   transition: box-shadow 0.2s ease;
 
   &:focus {
-    box-shadow: 0 0 0 2px #8b5cf6;
-    border-color: #8b5cf6;
+    // box-shadow: 0 0 0 2px #8b5cf6;
+    // border-color: #8b5cf6;
   }
 `;
 
@@ -193,13 +194,13 @@ const Textarea = styled.textarea`
   transition: box-shadow 0.2s ease;
 
   &:focus {
-    box-shadow: 0 0 0 2px #8b5cf6;
+    // box-shadow: 0 0 0 2px #8b5cf6;
     border-color: #8b5cf6;
   }
 `;
 
 const Button = styled.button`
-  background-color: #7c3aed;
+  background-color: #553C9A;
   color: white;
   padding: 0.5rem 1.25rem;
   font-weight: 600;

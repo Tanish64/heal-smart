@@ -7,8 +7,8 @@ import { FaStar } from "react-icons/fa";
 import DoctorDetails from "../DoctorDetails/DoctorDetails";
 import { FilterContext } from "../../context/FilterContext";
 import api from "../../config/api";
-import { doctors as localDoctors } from "../../utils/doctors";
 import DefaultDoctorImage from '../../img/Doctor_1.png';
+import { useLocation } from "react-router-dom";
 
 
 function ConsultDoctor() {
@@ -22,40 +22,30 @@ function ConsultDoctor() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch and combine doctors
+  // 🔄 Fetch doctors from backend only
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
         setLoading(true);
         const response = await api.get("/doctor/doctors");
+        const allDoctors = response.data.map((doc) => ({
+          _id: doc._id, // ✅ Add this line
+          name: doc.name,
+          specialization: doc.specialization || "General Practitioner",
+          experience: doc.bio || "Experience not provided",
+          availability: Array.isArray(doc.availability)
+            ? doc.availability.join(", ")
+            : doc.availability || "No timings",
+          imageUri: doc.image && doc.image.trim() !== "" ? doc.image : DefaultDoctorImage,
 
-        const allDoctors = [
-          ...response.data.map((doc) => ({
-            name: doc.name,
-            specialization: doc.specialization || doc.category || "General Practitioner",
-            experience: doc.bio || "Experience not provided",
-            address: doc.contact || "Address not provided",
-            availability: Array.isArray(doc.availability)
-              ? doc.availability.join(", ")
-              : doc.availability || "No timings",
-            imageUri: doc.imageUri || "/default-doctor.jpg",
-          })),
-          ...localDoctors.map((doc) => ({
-            name: doc.name,
-            specialization: doc.category || "General Practitioner",
-            experience: "Experience not provided",
-            address: doc.address || "Address not provided",
-            availability: doc.timings || "No timings",
-            imageUri: doc.imageUri || DefaultDoctorImage,
-          })),
-        ];
+        }));
 
         setDoctors(allDoctors);
         setError(null);
       } catch (err) {
         console.error("❌ Error fetching doctors:", err);
         toast.error("Failed to load doctors. Please try again later.");
-        setError("Failed to load doctors. Please try again later.");
+        setError("Failed to load doctors.");
       } finally {
         setLoading(false);
       }
@@ -63,8 +53,10 @@ function ConsultDoctor() {
 
     fetchDoctors();
   }, []);
+  
+ 
 
-  // Filter on change
+  // 🔎 Filter doctors
   useEffect(() => {
     let result = doctors;
 
@@ -130,7 +122,6 @@ function ConsultDoctor() {
           </div>
           <InnerLayout>
             <div className="space-y-4">
-              {/* Filter Dropdown + Search */}
               <div className="filters">
                 <select
                   value={selectedDoctor}
@@ -158,13 +149,10 @@ function ConsultDoctor() {
                   placeholder="Search by doctor name..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  aria-label="Search doctors"
                   className="w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
                 />
               </div>
 
-
-              {/* Doctor Cards */}
               <div className="doctor-list-scroll-container">
                 <div className="doctor-grid">
                   {filteredItems.map((item, idx) => (
@@ -173,14 +161,15 @@ function ConsultDoctor() {
                         src={item.imageUri}
                         alt={`${item.name}'s profile`}
                         className="doctor-img"
+                        onError={(e) => (e.target.src = DefaultDoctorImage)}
                       />
                       <div className="doctor-info">
                         <h3>{item.name}</h3>
                         <p>{item.specialization}</p>
-                        <p>{item.experience}</p>
+                        {/* <p>{item.experience}</p> */}
                         <div className="rating">{renderStars()}</div>
-                        <p>{item.address}</p>
-                        <p>{item.availability}</p>
+                        
+                        {/* <p>{item.availability}</p> */}
                         <button
                           onClick={() => notify(item)}
                           className="see-timings-btn"
@@ -192,8 +181,6 @@ function ConsultDoctor() {
                   ))}
                 </div>
               </div>
-
-
             </div>
             <ToastContainer />
           </InnerLayout>
@@ -206,15 +193,13 @@ function ConsultDoctor() {
 
 const DashboardStyled = styled.div`
   padding: 1rem;
-
   .heading h2 {
-    font-size: 28px;
-    color: #6a0dad;
-    font-weight: 700;
+    font-size: 2.5rem;
+    color: #553C9A;
+    font-weight: 00;
     margin: 25px 0;
     padding-left: 1rem;
   }
-
   select,
   input[type="text"] {
     width: 100%;
@@ -226,26 +211,22 @@ const DashboardStyled = styled.div`
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   }
-
   .filters {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
     margin-bottom: 2rem;
   }
-
   .doctor-list-scroll-container {
-    max-height: 63vh;
+    max-height: 70vh;
     overflow-y: auto;
     padding-right: 10px;
   }
-
   .doctor-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
     gap: 2rem;
   }
-
   .doctor-card {
     display: flex;
     flex-direction: column;
@@ -255,43 +236,35 @@ const DashboardStyled = styled.div`
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s ease;
   }
-
   .doctor-card:hover {
     transform: translateY(-4px);
   }
-
   .doctor-img {
-  width: 100%;
-  height: 220px;
-  object-fit: contain; /* <-- Changed from 'cover' */
-  object-position: center top;
-  background-color: #f9f9f9; /* Optional: gives padding effect for smaller images */
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
-}
-
-
+    width: 100%;
+    height: 220px;
+    object-fit: contain;
+    object-position: center top;
+    background-color: #f9f9f9;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
   .doctor-info {
     padding: 1rem;
   }
-
   .doctor-info h3 {
     font-size: 20px;
     font-weight: 700;
     color: #333;
   }
-
   .doctor-info p {
     margin: 0.2rem 0;
     color: #555;
   }
-
   .rating {
     display: flex;
     gap: 0.25rem;
     margin-top: 0.5rem;
   }
-
   .see-timings-btn {
     margin-top: 0.75rem;
     padding: 0.5rem 1rem;
@@ -302,11 +275,9 @@ const DashboardStyled = styled.div`
     transition: background 0.3s ease;
     border: none;
   }
-
   .see-timings-btn:hover {
     background: #4b0082;
   }
 `;
-
 
 export default ConsultDoctor;

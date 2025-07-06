@@ -64,6 +64,7 @@ function Home() {
             <h2>Consult Doctor</h2>
             <p>Explore specialists and book appointments hassle-free</p>
           </Card>
+          
         </CardContainer>
       </div>
     </HomeStyled>

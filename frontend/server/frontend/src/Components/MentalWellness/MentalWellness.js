@@ -62,7 +62,7 @@ function MentalWellness() {
 const MentStyled = styled.nav`
   
   .nav h2{
-    color: darkviolet;
+    color: #553C9A;
     font-size: 40px;
     font-weight: 705;
     margin: 11px 12px;
@@ -111,7 +111,7 @@ const MentStyled = styled.nav`
     width: 100%;
     max-width: 900px;
     padding: 0px 20px;
-    margin: 70px -48px;
+    margin: 80px -48px;
   }
 
   .search-box{
@@ -120,7 +120,7 @@ const MentStyled = styled.nav`
     justify-content: space-between;
     gap: 20px;
     background-color: #f0f4f9;
-    margin: 10px 40px;
+    margin: 20px 40px;
     padding: 7px 17px;
     border-radius: 50px;
     /* margin-right: 70px */

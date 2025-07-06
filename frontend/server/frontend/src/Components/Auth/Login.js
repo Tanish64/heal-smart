@@ -5,6 +5,7 @@ import api from '../../config/api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import hero from '../../img/hero.png';
+import BlurredBackground from '../layouts/BlurredBackground';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -89,6 +90,7 @@ const Login = () => {
 
     return (
         <LoginStyled>
+            <BlurredBackground />
             <div className="container">
                 <div className="left-section">
                     <div className="hero-content">
@@ -167,6 +169,11 @@ const LoginStyled = styled.div`
     overflow-x: hidden;
 
     .container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
         display: flex;
         width: 100%;
         max-width: 1200px;

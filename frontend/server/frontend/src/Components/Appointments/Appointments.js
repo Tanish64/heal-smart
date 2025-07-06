@@ -1,9 +1,13 @@
+import { useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Appointments = () => {
-  const [isDoctor, setIsDoctor] = useState(false); // Toggle view
+  const location = useLocation();
+  const [isDoctor, setIsDoctor] = useState(false);
   const [appointments, setAppointments] = useState([]);
   const [form, setForm] = useState({
     doctorId: "",
@@ -21,8 +25,15 @@ const Appointments = () => {
     if (userRole === "doctor") {
       setIsDoctor(true);
       fetchPendingAppointments();
+    } else {
+      const { doctorId, preferredTime } = location.state || {};
+      setForm((prevForm) => ({
+        ...prevForm,
+        doctorId: doctorId || prevForm.doctorId,
+        preferredTime: preferredTime || prevForm.preferredTime,
+      }));
     }
-  }, []);
+  }, [location.state]);
 
   const fetchPendingAppointments = async () => {
     try {
@@ -33,6 +44,7 @@ const Appointments = () => {
       });
       setAppointments(res.data);
     } catch (err) {
+      toast.error("Failed to fetch appointments");
       console.error("Error fetching appointments:", err);
     }
   };
@@ -48,8 +60,10 @@ const Appointments = () => {
           },
         }
       );
+      toast.success("Appointment approved!");
       fetchPendingAppointments();
     } catch (err) {
+      toast.error("Failed to approve appointment");
       console.error("Error approving appointment:", err);
     }
   };
@@ -58,7 +72,7 @@ const Appointments = () => {
     e.preventDefault();
     try {
       await axios.post("/api/appointments/request", form);
-      alert("Appointment Requested!");
+      toast.success("Appointment Requested Successfully!");
       setForm({
         doctorId: "",
         patientName: "",
@@ -68,12 +82,14 @@ const Appointments = () => {
         preferredTime: "",
       });
     } catch (err) {
+      toast.error("Failed to request appointment");
       console.error("Error requesting appointment:", err);
     }
   };
 
   return (
     <Wrapper>
+      <ToastContainer />
       <h2>{isDoctor ? "Pending Appointments" : "Request Appointment"}</h2>
 
       {isDoctor ? (
@@ -145,14 +161,10 @@ const Appointments = () => {
 };
 
 const Wrapper = styled.div`
-  
-  // background: linear-gradient(to bottom right, #e9d8fd, #d6bcfa);
-  // display: flex;
   align-items: center;
   justify-content: center;
   padding: 2.6rem 10rem;
-  border-radius:32px;
-  
+  border-radius: 32px;
 
   .form-container {
     background: white;
@@ -166,7 +178,8 @@ const Wrapper = styled.div`
   h2 {
     text-align: center;
     font-size: 2.5rem;
-    color: #2d3748;
+    color: #553C9A;
+    font-weight:800;
     margin: 3.5rem;
   }
 
@@ -201,7 +214,7 @@ const Wrapper = styled.div`
   button {
     padding: 0.9rem;
     font-size: 1rem;
-    background: #805ad5;
+    background:  #553C9A;
     color: white;
     border: none;
     border-radius: 8px;
@@ -210,7 +223,7 @@ const Wrapper = styled.div`
     transition: background 0.3s ease;
 
     &:hover {
-      background: #6b46c1;
+      background: rgb(74, 36, 165);
     }
 
     &:disabled {

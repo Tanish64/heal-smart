@@ -1,11 +1,11 @@
-
+// routes/doctorDashboard.js
 import express from "express";
 import authMiddleware from "../middleware/auth.js";
 import {
   getPendingAppointments,
   getApprovedAppointments,
 } from "../controllers/appointments.js";
-import { getDoctorDetails } from "../controllers/doctor.js"; // ✅ Now it works!
+import { getDoctorDetails } from "../controllers/doctor.js";
 
 const router = express.Router();
 
@@ -21,7 +21,7 @@ router.get("/", authMiddleware, async (req, res) => {
       ],
     });
   } catch (error) {
-    console.error("Error fetching doctor dashboard:", error);
+    console.error("Error fetching doctor dashboard:", error.message);
     res.status(500).json({ message: "Failed to fetch doctor dashboard" });
   }
 });

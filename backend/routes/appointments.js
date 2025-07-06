@@ -52,6 +52,24 @@ router.get("/doctor/pending", authMiddleware, async (req, res) => {
   }
 });
 
+// ✅ GET: Approved appointments for a doctor
+router.get("/doctor/approved", authMiddleware, async (req, res) => {
+  try {
+    console.log("Fetching approved appointments for doctor:", req.user.id);
+
+    const appointments = await Appointment.find({
+      doctorId: req.user.id,
+      status: "approved",
+    });
+
+    res.json(appointments);
+  } catch (err) {
+    console.error("❌ Failed to fetch approved appointments:", err);
+    res.status(500).json({ message: "Failed to fetch approved appointments" });
+  }
+});
+
+
 
 // ✅ PATCH: Approve appointment
 router.patch("/approve/:id", authMiddleware, async (req, res) => {

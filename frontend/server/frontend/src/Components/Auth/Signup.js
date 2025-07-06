@@ -5,6 +5,7 @@ import api from '../../config/api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import hero from '../../img/hero.png';
+import BlurredBackground from '../layouts/BlurredBackground';
 
 const Signup = () => {
     const navigate = useNavigate();
@@ -14,13 +15,12 @@ const Signup = () => {
         email: '',
         password: '',
         confirmPassword: '',
-        specialization: '',
-        bio: '',
-        availability: '',
-        doctorCode: ''
+        specialization: ''
+        
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [image, setImage] = useState(null);
 
     const handleTabChange = (type) => {
         setUserType(type);
@@ -57,10 +57,11 @@ const Signup = () => {
         }
 
         if (userType === 'doctor') {
-            if (!formData.specialization || !formData.bio || !formData.availability || !formData.doctorCode) {
-                setError('Please fill in all required doctor fields');
-                return false;
-            }
+            if (!formData.specialization) {
+    setError('Please select a specialization');
+    return false;
+}
+
         }
 
         return true;
@@ -77,16 +78,36 @@ const Signup = () => {
         setLoading(true);
 
         try {
+            let imageUrl = '';
+
+            if (userType === 'doctor' && image) {
+                const form = new FormData();
+                form.append('file', image);
+                form.append('upload_preset', 'ml_default'); // ✅ correct
+                form.append('cloud_name', 'dhelj5vrg');       // 🔁 Replace this
+
+                const cloudinaryRes = await fetch('https://api.cloudinary.com/v1_1/dhelj5vrg/image/upload', {
+                    method: 'POST',
+                    body: form
+                });
+
+                const data = await cloudinaryRes.json();
+
+                if (data.secure_url) {
+                    imageUrl = data.secure_url;
+                } else {
+                    throw new Error('Image upload failed');
+                }
+            }
+
             const userData = {
                 name: formData.name,
                 email: formData.email,
                 password: formData.password,
                 role: userType,
                 ...(userType === 'doctor' && {
-                    accessCode: formData.doctorCode,
                     specialization: formData.specialization,
-                    bio: formData.bio,
-                    availability: formData.availability.split(',').map(day => day.trim())
+                    image: imageUrl
                 })
             };
 
@@ -99,9 +120,9 @@ const Signup = () => {
                 throw new Error('Unexpected response from server');
             }
         } catch (err) {
-            const errorMessage = err.response?.data?.message || 
-                               err.message || 
-                               'Registration failed. Please try again.';
+            const errorMessage = err.response?.data?.message ||
+                err.message ||
+                'Registration failed. Please try again.';
             setError(errorMessage);
             toast.error(errorMessage);
         } finally {
@@ -111,6 +132,7 @@ const Signup = () => {
 
     return (
         <SignupStyled userType={userType}>
+            <BlurredBackground />
             <div className="container">
                 <div className="left-section">
                     <div className="hero-content">
@@ -123,13 +145,13 @@ const Signup = () => {
                     <div className="form-container">
                         <h2>Create Account</h2>
                         <div className="tab-container">
-                            <button 
+                            <button
                                 className={`tab-button ${userType === 'patient' ? 'active' : ''}`}
                                 onClick={() => handleTabChange('patient')}
                             >
                                 User
                             </button>
-                            <button 
+                            <button
                                 className={`tab-button ${userType === 'doctor' ? 'active' : ''}`}
                                 onClick={() => handleTabChange('doctor')}
                             >
@@ -198,41 +220,28 @@ const Signup = () => {
                                             <option value="Pulmonologist">Pulmonologist</option>
                                         </select>
                                     </div>
+                                    
                                     <div className="form-group">
                                         <input
-                                            type="password"
-                                            name="doctorCode"
-                                            placeholder="Doctor Access Code"
-                                            value={formData.doctorCode}
-                                            onChange={handleChange}
-                                            required
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => setImage(e.target.files[0])}
                                         />
                                     </div>
-                                    <div className="form-group">
-                                        <input
-                                            type="text"
-                                            name="availability"
-                                            placeholder="Availability (e.g., Mon 10-12, Wed 3-6)"
-                                            value={formData.availability}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <textarea
-                                            name="bio"
-                                            placeholder="Short Bio"
-                                            value={formData.bio}
-                                            onChange={handleChange}
-                                            required
-                                            rows="3"
-                                        />
-                                    </div>
+                                    {image && (
+                                        <div className="form-group">
+                                            <img
+                                                src={URL.createObjectURL(image)}
+                                                alt="Preview"
+                                                style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
+                                            />
+                                        </div>
+                                    )}
                                 </>
                             )}
 
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 className="submit-button"
                                 disabled={loading}
                             >
@@ -240,7 +249,7 @@ const Signup = () => {
                             </button>
                         </form>
                         <p className="login-link">
-                            Already have an account? 
+                            Already have an account?
                             <button onClick={() => navigate('/login')}>
                                 Sign In
                             </button>
@@ -258,76 +267,94 @@ const SignupStyled = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    background; white;
-    padding-bottom: 2vh;
+    background: white;
+    padding: 0px;
     overflow-x: hidden;
 
-   
     .container {
-        display: flex;
-        width: 100%;
-        max-width: 1200px;
-        min-height: 600px;
-        background: rgba(234, 226, 240, 0.9);
-        border-radius: 32px;
-        backdrop-filter: blur(4.5px);
-        overflow: hidden;
-        // margin: 10px;
-    }
-
+    position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  height: ${props => props.userType === 'doctor' ? 'calc(100vh - 4vh)' : '690px'};
+  background: rgba(242, 239, 245, 0.9);
+  border-radius: 32px;
+  backdrop-filter: blur(4.5px);
+  overflow: hidden;
+  transition: height 0.6s ease-in-out;
+}
     .left-section {
         flex: 1;
-        background: linear-gradient(135deg,rgb(72, 42, 143), #9F7AEA);
+        background: linear-gradient(135deg, rgb(72, 42, 143), #9F7AEA);
         padding: 3rem;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-    }
 
-    .hero-content {
-        text-align: center;
+        .hero-content {
+            text-align: center;
 
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            font-weight: 700;
-        }
+            h1 {
+                font-size: 2.5rem;
+                margin-bottom: 1rem;
+                font-weight: 700;
+            }
 
-        p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
+            p {
+                font-size: 1.2rem;
+                margin-bottom: 2rem;
+                opacity: 0.9;
+            }
 
-        img {
-            max-width: 80%;
-            height: auto;
+            img {
+                max-width: 80%;
+                height: auto;
+            }
         }
     }
 
     .right-section {
         flex: 1;
-        padding: 3rem;
+        padding: ${props => props.userType === 'doctor' ? '5rem 3rem 3rem 3rem' : '3rem'};
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
-        overflow-y: auto;
-
-        .form-container {
-            width: 100%;
-            max-width: 400px;
-            padding-bottom: 3rem;
-
-            form {
-                padding-bottom: ${props => props.userType === 'doctor' ? '2rem' : '1rem'};
-            }
-        }
+        overflow: hidden;
+        height: 100%;
+        max-height: 100%;
+        transition: padding 0.8s ease;
     }
 
     .form-container {
         width: 100%;
         max-width: 400px;
+
+        overflow-y: ${props => props.userType === 'doctor' ? 'auto' : 'hidden'};
+        max-height: ${props => props.userType === 'doctor' ? 'calc(100vh - 10rem)' : '100%'};
+        padding-right: ${props => props.userType === 'doctor' ? '0.5rem' : '0'};
+        transition: max-height 0.8s ease;
+
+        form {
+            padding-bottom: ${props => props.userType === 'doctor' ? '2rem' : '1rem'};
+        }
+
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            // background-color: #c4b5fd;
+            border-radius: 4px;
+        }
 
         h2 {
             font-size: 2rem;
@@ -365,7 +392,6 @@ const SignupStyled = styled.div`
     }
 
     .form-group {
-        
         margin-bottom: 1.2rem;
 
         input, textarea, select {
@@ -390,13 +416,8 @@ const SignupStyled = styled.div`
             background-color: white;
             cursor: pointer;
 
-            &:hover {
-                border-color: #9F7AEA;
-            }
-
             option {
                 color: #2D3748;
-                padding: 0.5rem;
             }
         }
 
@@ -404,6 +425,13 @@ const SignupStyled = styled.div`
             resize: vertical;
             min-height: 30px;
         }
+    }
+
+    .image-preview img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin-top: 1rem;
     }
 
     .submit-button {
@@ -429,47 +457,48 @@ const SignupStyled = styled.div`
     }
 
     .login-link {
-        margin-top: .5rem;
+        margin-top: 1rem;
         text-align: center;
+        font-size: 0.95rem;
         color: #4A5568;
 
         button {
             background: none;
             border: none;
             color: #6B46C1;
-            font-weight: 600;
             cursor: pointer;
-            margin-left: 0.5rem;
+            margin-left: 0.25rem;
+            font-weight: 600;
+            text-decoration: underline;
+            padding: 0;
 
             &:hover {
-                text-decoration: underline;
+                color: #553C9A;
             }
         }
     }
 
     @media (max-width: 768px) {
         padding: 1rem;
-        
+
         .container {
-            margin: 0;
+            flex-direction: column;
+            height: auto;
         }
 
-        .left-section {
+        .left-section,
+        .right-section {
+            width: 100%;
             padding: 2rem;
+            max-height: none;
         }
 
         .right-section {
-            padding: 2rem;
+            max-height: 80vh;
         }
 
-        .hero-content {
-            h1 {
-                font-size: 2rem;
-            }
-
-            p {
-                font-size: 1rem;
-            }
+        .form-container {
+            max-height: 100%;
         }
     }
 `;

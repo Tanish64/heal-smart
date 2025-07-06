@@ -40,12 +40,12 @@ import {
     icon: appointment,
     link: "/dashboard/appointments",
   },
-  {
-    id: 6,
-    title: "Blogs",
-    icon: blog,
-    link: "/dashboard/blogs", // ✅ Add this route if needed
-  },
+  // {
+  //   id: 6,
+  //   title: "Blogs",
+  //   icon: blog,
+  //   link: "/dashboard/blogs", // ✅ Add this route if needed
+  // },
   {
     id: 7,
     title: "News & Awareness",
@@ -57,5 +57,12 @@ import {
     title: "Prediction History",
     icon: history,
     link: "/dashboard/prediction-history", // ✅ Add this route if needed
+  }
+  ,
+  {
+    id: 9,
+    title: "Nearby Hospitals",
+    icon: medical, // you can change to a location/hospital icon
+    action: "findNearbyHospitals",
   }
 ];

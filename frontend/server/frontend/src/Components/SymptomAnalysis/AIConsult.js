@@ -162,7 +162,7 @@ const MentStyled = styled.nav`
     justify-content: space-between;
     gap: 20px;
     background-color: #f0f4f9;
-    margin: 25px 40px;
+    margin: 55px 40px;
     padding: 7px 17px;
     border-radius: 50px;
   }

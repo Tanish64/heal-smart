@@ -1,148 +1,123 @@
-import React, { useContext, useEffect, useState } from "react";
+
+import React, { useState } from "react";
 import styled from "styled-components";
 import { InnerLayout } from "../../styles/Layouts";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaStar } from "react-icons/fa";
 import api from "../../config/api";
+import { useNavigate } from "react-router-dom";
 
 const times = [
-    { "id": 1, "time": "10:00 AM", "available": true },
-    { "id": 2, "time": "11:00 AM", "available": false },
-    { "id": 3, "time": "12:00 PM", "available": true },
-    { "id": 4, "time": "01:00 PM", "available": true },
-    { "id": 5, "time": "02:00 PM", "available": false }
+  { id: 1, time: "10:00 AM", available: true },
+  { id: 2, time: "11:00 AM", available: false },
+  { id: 3, time: "12:00 PM", available: true },
+  { id: 4, time: "01:00 PM", available: true },
+  { id: 5, time: "02:00 PM", available: false },
 ];
 
 function DoctorDetails({ DoctorDet }) {
-  const [disable, setDisable] = useState(false);
-  const [selectedTime, setSelectedTime] = useState(null);
+  
+  const navigate = useNavigate();
+  const handleBookNow = (time) => {
+  navigate("/dashboard/appointments", {
+    state: {
+      doctorId: DoctorDet._id,
+      preferredTime: time.time,
+    },
+  });
+};
 
-  const handleBookNow = async (time) => {
-    try {
-      setSelectedTime(time);
-      
-      const appointmentData = {
-        doctorId: DoctorDet._id,
-        timeSlot: time.time,
-        date: new Date().toISOString().split('T')[0]
-      };
-
-      const response = await api.post('/appointments/book', appointmentData);
-      
-      if (response.data.success) {
-        toast.success("Appointment booked successfully!");
-        // Mark the time slot as unavailable
-        time.available = false;
-        setDisable(true);
-      } else {
-        toast.error("Failed to book appointment. Please try again.");
-      }
-    } catch (err) {
-      console.error("Error booking appointment:", err);
-      toast.error(err.response?.data?.message || "Failed to book appointment");
-    }
-  };
+  
 
   return (
     <MentStyled>
       <InnerLayout className="main">
-        <div class="w-full max-w-sm bg-white border mx-auto my-auto border-gray-200 rounded-lg shadow dark:bg-white dark:border-white-700">
-          <div class="flex justify-end px-4 pt-4"></div>
-          <div class="flex flex-col items-center pb-10">
-            <img
-              class="w-24 h-24 mb-3 rounded-full shadow-lg"
-              src={DoctorDet.imageUri}
-              alt="Bonnie image"
-            />
-            <h5 class="mb-1 text-xl font-medium text-gray-900">
-              {DoctorDet.name}
-            </h5>
-            <span class="text-sm text-gray-500 dark:text-gray-400">
-              {DoctorDet.specialisation}
-            </span>
-
-            <p className="text-gray-700 text-base">
-              {" "}
-              Experience: {DoctorDet.experience}
-            </p>
-
-            <p className="text-gray-900 leading-none">{DoctorDet.address}</p>
-            <div class="flex mt-4 md:mt-6">
-              
+        {/* Doctor Profile Card */}
+        <div className="flex flex-col md:flex-row items-center gap-6 bg-white p-6 shadow-lg rounded-lg max-w-4xl mx-auto mt-6">
+          <div className="image-wrapper">
+  <img
+    src={DoctorDet?.imageUri || "/default-doctor.png"}
+    alt="Doctor"
+    onError={(e) => { e.target.src = "/default-doctor.png"; }}
+  />
+</div>
+          <div className="text-center md:text-left">
+            <h2 className="text-2xl font-bold text-gray-800">{DoctorDet?.name}</h2>
+            <p className="text-gray-600">{DoctorDet?.specialisation}</p>
+            <p className="text-gray-600">Experience: {DoctorDet?.experience}</p>
+            <p className="text-gray-600">Address: {DoctorDet?.address}</p>
+            <div className="flex items-center justify-center md:justify-start mt-2">
+              {[...Array(5)].map((_, index) => (
+                <FaStar
+                  key={index}
+                  className={`text-yellow-400 ${
+                    index < DoctorDet?.rating ? "fill-current" : "text-gray-300"
+                  }`}
+                />
+              ))}
             </div>
           </div>
         </div>
 
+        {/* Time Slots Table */}
         <div className="w-full max-w-md mx-auto mt-8 rounded-lg">
-      <table className="min-w-full">
-        <thead>
-          <tr>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Time
-            </th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Availability
-            </th>
-            <th className="px-6 py-3 bg-gray-50"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {times.map((time) => (
-            <tr key={time.id} className="bg-white">
-              <td className="px-6 py-4 whitespace-nowrap">{time.time}</td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {time.available ? "Available" : "Not Available"}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {time.available && (
-                  <button
-                    onClick={() => handleBookNow(time)}
-                    className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full"
-                  >
-                    Book Now
-                  </button>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          <table className="min-w-full">
+            <thead>
+              <tr>
+                <th className="px-6 py-3">Time</th>
+                <th className="px-6 py-3">Availability</th>
+                <th className="px-6 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {times.map((time) => (
+                <tr key={time.id} className="bg-white">
+                  <td className="px-6 py-4">{time.time}</td>
+                  <td className="px-6 py-4">
+                    {time.available ? "Available" : "Not Available"}
+                  </td>
+                  <td className="px-6 py-4">
+                    {time.available && (
+  <button
+  onClick={() => handleBookNow(time)}
+  className="book-now-btn"
+>
+  Book Now
+</button>
+
+)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        
+        
       </InnerLayout>
       <ToastContainer />
     </MentStyled>
   );
 }
-
 const MentStyled = styled.nav`
-  .nav h3 {
-    color: #494949;
-  }
   .main {
     flex: 1;
     min-height: 100vh;
     padding-bottom: 15vh;
     position: relative;
-  }
-
-  .main .nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 22px;
-    padding: 20px;
-    /* color: white; */
+    // background-color: #f9f9ff;
+    
   }
 
   .main-container {
     max-width: 900px;
-    /* padding: -70px; */
     margin: -33px 88px;
-    color: black;
+    color: #333;
   }
 
-  .main .greet {
+  .greet {
     margin: 50px 0px;
     font-size: 40px;
     color: #928989;
@@ -150,117 +125,146 @@ const MentStyled = styled.nav`
     padding: 20px;
   }
 
-  .main .greet span {
+  .greet span {
     background: -webkit-linear-gradient(16deg, #4b90ff, #ff5546);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
-  .main-bottom {
-    position: absolute;
-    bottom: 0;
+  .image-wrapper {
+  width: 400px;
+  height: 400px;
+  min-width: 160px;
+  min-height: 160px;
+  // border-radius: 9999px;
+  overflow: hidden;
+  // border: 4px solid #c084fc;
+  box-shadow: 0 0 8px rgba(147, 112, 219, 0.2);
+  background : white;
+  
+}
+
+.image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Crop & center */
+  object-position: center;
+  // border-radius: 9999px;
+}
+
+
+  .doctor-card {
+    background: white;
+    box-shadow: 0 4px 12px rgba(147, 112, 219, 0.15);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-top: 2rem;
+    transition: 0.3s ease;
+  }
+
+  .doctor-card img {
+    width: 160px;
+    height: 160px;
+    border-radius: 9999px;
+    object-fit: cover;
+    border: 4px solid #c084fc; /* purple-300 */
+  }
+
+  .doctor-card h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #4c1d95; /* deep purple */
+  }
+
+  .doctor-card p {
+    color: #6b7280; /* gray-600 */
+    margin: 0.25rem 0;
+  }
+
+  .doctor-card .stars {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 4px;
+  }
+
+  .stars svg {
+    font-size: 1.25rem;
+  }
+
+  .table-container {
+    margin-top: 3rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(147, 112, 219, 0.1);
+    overflow: hidden;
+  }
+
+  table {
     width: 100%;
-    max-width: 900px;
-    padding: 0px 20px;
-    margin: 60px -48px;
+    border-collapse: collapse;
   }
 
-  .search-box {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    background-color: #f0f4f9;
-    margin: 10px 40px;
-    padding: 7px 17px;
-    border-radius: 50px;
-    /* margin-right: 70px */
+  th, td {
+    padding: 1rem;
+    text-align: left;
   }
 
-  .search-box img {
-    width: 24px;
-    cursor: pointer;
+  thead {
+    background-color: #ede9fe; /* light lavender */
   }
 
-  .search-box input {
-    flex: 1;
-    background: transparent;
-    border: none;
+  tbody tr {
+    border-top: 1px solid #eee;
+  }
+
+  tbody tr:hover {
+    background-color: #f3e8ff;
+  }
+
+  
+  .book-now-btn {
+  background-color:#553C9A;; /* Tailwind's bg-purple-500 */
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 9999px; /* Fully rounded */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #9333ea; /* Tailwind's bg-purple-700 */
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:focus {
     outline: none;
-    padding: 9px;
-    font-size: 18px;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.4); /* purple ring */
+  }
+}
+
+  .book-button:hover {
+    background-color: #6b21a8;
   }
 
-  .search-box div {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+  .Toastify__toast {
+    font-size: 0.9rem;
+    border-radius: 10px;
   }
 
-  .main .bottom-info {
-    font-size: 13px;
-    margin: 15px;
-    text-align: center;
-    font-weight: 300px;
-  }
-
+  /* Scrollbar hidden for results */
   .result {
-    padding: 0px 5%;
+    padding: 0 5%;
     max-height: 70vh;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 
   .result::-webkit-scrollbar {
     display: none;
   }
-
-  .result-title {
-    margin: 40px 0px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-
-  .result img {
-    width: 40px;
-    border-radius: 50%;
-  }
-
-  .result-data {
-    display: flex;
-    align-items: start;
-    gap: 20px;
-  }
-
-  .loader {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .loader hr {
-    border-radius: 4px;
-    border: none;
-    background-color: #f6f7f8;
-    background: linear-gradient(to right, #d5a8ff, #f6f7f8, #d5a8ff);
-    background-size: 800px 50px;
-    height: 20px;
-    animation: loader 3s infinite linear;
-  }
-  @keyframes loader {
-    0% {
-      background-position: -800px 0px;
-    }
-    100% {
-      background-position: 800px 0px;
-    }
-  }
-  .result-data p {
-    font-size: 17px;
-    font-weight: 300;
-    line-height: 1.8;
-  }
 `;
+
 
 export default DoctorDetails;

@@ -5,6 +5,8 @@ import AIConsult from "./AIConsult";
 import { notes } from "../../utils/Icons";
 import { FilterContext } from "../../context/FilterContext";
 import { AIContext } from "../../context/AIContext";
+import { useNavigate } from "react-router-dom";
+
 
 let DiseaseMapping = {
   Psoriasis: "Dermatologist",
@@ -23,6 +25,8 @@ let DiseaseMapping = {
 
 function SymptomAnalysis({ updateActive }) {
   const { doctorSpec, setDoctorSpec } = useContext(FilterContext);
+  const navigate = useNavigate();
+
 
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
   const [submitted, setSubmitted] = useState(false);
@@ -44,70 +48,74 @@ function SymptomAnalysis({ updateActive }) {
     setSelectedSymptoms(updatedSymptoms);
   };
 
-  const handleSubmit = () => {
-    if (selectedSymptoms.length === 0) return;
+const handleSubmit = () => {
+  if (selectedSymptoms.length === 0) return;
 
-    const data = { symptoms: selectedSymptoms };
+  const data = { symptoms: selectedSymptoms };
 
-    fetch("http://localhost:5001/predict", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
+  fetch("http://localhost:5001/predict", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((res) => {
+      if (!res.ok) {
+        return res.json().then((err) => {
+          console.error("API Error Response:", err);
+          throw new Error(err.message || "Network error");
+        });
+      }
+      return res.json();
     })
-      .then((res) => {
-        if (!res.ok) {
-          return res.json().then((err) => {
-            console.error("API Error Response:", err);
-            throw new Error(err.message || "Network error");
-          });
-        }
-        return res.json();
-      })
-      .then((data) => {
-        console.log("API Success Response:", data);
-        const prediction = data.prediction || "undefined";
-        setDiagnosis(prediction);
+    .then((data) => {
+      console.log("API Success Response:", data);
+      const prediction = data.prediction || "undefined";
+      setDiagnosis(prediction);
+      setSubmitted(true); // moved here
 
-        // NEW: Save prediction to backend
-        const token = localStorage.getItem("token");
-        if (token && prediction !== "undefined") {
-          fetch("http://localhost:3001/api/save-prediction", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              inputFeatures: selectedSymptoms,
-              prediction: prediction,
-            }),
+      const token = localStorage.getItem("token");
+      if (token && prediction !== "undefined") {
+        fetch("http://localhost:3001/api/save-prediction", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            inputFeatures: selectedSymptoms,
+            prediction: prediction,
+          }),
+        })
+          .then((res) => res.json())
+          .then((resp) => {
+            console.log("Prediction saved to history:", resp);
           })
-            .then((res) => res.json())
-            .then((resp) => {
-              console.log("Prediction saved to history:", resp);
-            })
-            .catch((err) => {
-              console.error("Error saving prediction:", err);
-            });
-        }
-      })
-      .catch((err) => {
-        console.error("Fetch error:", err);
-        setDiagnosis("undefined");
-      });
-
-    setSubmitted(true);
-  };
+          .catch((err) => {
+            console.error("Error saving prediction:", err);
+          });
+      }
+    })
+    .catch((err) => {
+      console.error("Fetch error:", err);
+      setDiagnosis("undefined");
+      setSubmitted(true); // also ensure it's here in case of error
+    });
+};
 
 
-  const handleConsultDoctor = () => {
-    if (diagnosis && diagnosis !== "undefined" && DiseaseMapping[diagnosis]) {
-      setDoctorSpec(DiseaseMapping[diagnosis]);
-    }
-    updateActive(4);
-  };
+
+const handleConsultDoctor = () => {
+  const specialty = DiseaseMapping[diagnosis];
+
+  if (specialty) {
+    setDoctorSpec(specialty); // 🔄 Set global context
+    navigate("/dashboard/consult-doctor"); // 🚫 No state needed
+  }
+};
+
+
 
   const handleConsultAI = () => {
     setConsultAI(true);

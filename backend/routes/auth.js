@@ -1,4 +1,3 @@
-
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -21,18 +20,18 @@ router.post("/signup", async (req, res) => {
         console.log("Signup Route Hit");
         console.log("Received Data:", req.body);
 
-        const { name, email, password, role, accessCode } = req.body;
+        const {
+            name,
+            email,
+            password,
+            role,
+            specialization,
+            contact,
+            image
+        } = req.body;
 
         if (!name || !email || !password || !role) {
             return res.status(400).json({ message: "Missing fields" });
-        }
-
-        // Check for doctor access code
-        if (role === "doctor") {
-            if (accessCode !== process.env.DOCTOR_ACCESS_CODE) {
-                console.log("Invalid doctor access code");
-                return res.status(403).json({ message: "Invalid doctor access code" });
-            }
         }
 
         const existingUser = await User.findOne({ email });
@@ -44,7 +43,18 @@ router.post("/signup", async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = new User({ name, email, password: hashedPassword, role });
+        const newUser = new User({
+            name,
+            email,
+            password: hashedPassword,
+            role,
+            ...(role === "doctor" && {
+                specialization,
+                contact,
+                image
+            })
+        });
+
         await newUser.save();
 
         console.log("User registered:", newUser);
@@ -81,7 +91,7 @@ router.post("/login", async (req, res) => {
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
         console.log("Login successful, Token:", token);
-        res.json({ token, userId: user._id, role: user.role }); // Send role in response
+        res.json({ token, userId: user._id, role: user.role });
     } catch (error) {
         console.error("Login Error:", error);
         res.status(500).json({ message: "Server Error", error });

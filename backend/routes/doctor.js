@@ -1,52 +1,50 @@
-// routes/doctor.js
 import express from "express";
-import Doctor from "../models/doctorModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import User from "../models/user.js";
 import { getAllDoctors } from "../controllers/doctor.js";
-import authMiddleware from "../middleware/auth.js"; // ✅ Required for protected routes
+import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
 
 // ✅ Get all doctors (Public Route)
 router.get("/doctors", getAllDoctors);
 
-// ✅ Doctor Signup Route
+// ✅ Doctor Signup Route (with image URI from frontend)
 router.post("/signup", async (req, res) => {
   console.log("📥 Doctor signup route hit");
+  console.log("Doctor signup payload:", req.body);
+
   const {
     name,
     email,
     password,
-    doctorCode,
     specialization,
     contact,
-    bio,
-    availability
+    imageUri // from Cloudinary or frontend
   } = req.body;
 
   try {
-    const existingDoctor = await Doctor.findOne({ email });
-    if (existingDoctor) {
-      return res.status(400).json({ message: "Doctor already exists" });
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const doctor = new Doctor({
+    const doctor = new User({
       name,
       email,
       password: hashedPassword,
-      doctorCode,
+      role: "doctor",
       specialization,
       contact,
-      bio,
-      availability: Array.isArray(availability) ? availability : [availability],
+      imageUri
     });
 
     await doctor.save();
 
-    const token = jwt.sign({ doctorId: doctor._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: doctor._id, role: doctor.role }, process.env.JWT_SECRET, {
       expiresIn: "1h"
     });
 
@@ -67,17 +65,17 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const doctor = await Doctor.findOne({ email });
-    if (!doctor) {
+    const user = await User.findOne({ email });
+    if (!user || user.role !== "doctor") {
       return res.status(401).json({ message: "Doctor not found" });
     }
 
-    const isMatch = await bcrypt.compare(password, doctor.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ doctorId: doctor._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: "1h"
     });
 
@@ -94,10 +92,12 @@ router.post("/login", async (req, res) => {
 // ✅ Get Current Doctor Profile Route
 router.get("/me", authMiddleware, async (req, res) => {
   try {
-    const doctor = await Doctor.findById(req.user.id).select("-password");
-    if (!doctor) {
+    const doctor = await User.findById(req.user.id).select("-password");
+
+    if (!doctor || doctor.role !== "doctor") {
       return res.status(404).json({ message: "Doctor not found" });
     }
+
     res.json(doctor);
   } catch (err) {
     console.error("❌ Error fetching doctor profile:", err);
@@ -106,4 +106,3 @@ router.get("/me", authMiddleware, async (req, res) => {
 });
 
 export default router;
-

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import axios from "axios";
+import api from "../../config/api"; // ✅ Use your Axios instance
 
 const ApprovedAppointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -8,10 +8,7 @@ const ApprovedAppointments = () => {
 
   const fetchApprovedAppointments = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get("/api/appointments/doctor/approved", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get("/appointments/doctor/approved"); // ✅ Using `api`
       setAppointments(res.data);
     } catch (error) {
       console.error("❌ Failed to fetch approved appointments:", error);
@@ -50,7 +47,7 @@ const ApprovedAppointments = () => {
 
 export default ApprovedAppointments;
 
-// Styled Components (same as pending)
+// Styled Components
 const Container = styled.div`
   padding: 2rem;
   h1 {

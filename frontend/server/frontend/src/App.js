@@ -5,6 +5,7 @@ import bg from "./img/bg.png";
 import { ToastContainer } from "react-toastify";
 
 // Auth Pages
+import LandingPage from './Components/LandingPage/LandingPage';
 import Login from './Components/Auth/Login';
 import Signup from './Components/Auth/Signup';
 import ProtectedRoute from './Components/Auth/ProtectedRoute';
@@ -20,14 +21,16 @@ import ConsultDoctor from "./Components/ConsultDoctor/ConsultDoctor";
 import Appointments from './Components/Appointments/Appointments';
 import News from './Components/News/News';
 import DoctorDashboard from './Components/DoctorDashboard/DoctorDashboard';
-import BlogApp from "./Components/BlogApp/BlogApp";
+// import BlogApp from "./Components/BlogApp/BlogApp";
 import PredictionHistory from "./Components/PredictionHistory/PredictionHistory";
 import DoctorDashboardLayout from "./Components/DoctorDashboard/DoctorDashboardLayout";
 import PendingAppointments from "./Components/PendingAppointments/PendingAppointments";
 import ApprovedAppointments from "./Components/ApprovedAppointments/ApprovedAppointments";
+import DoctorDetails from './Components/DoctorDetails/DoctorDetails';
+
 
 const router = createBrowserRouter([
-  { path: "/", element: <Login /> },
+  { path: "/", element: <LandingPage /> },
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <Signup /> },
   {
@@ -46,7 +49,7 @@ const router = createBrowserRouter([
       { path: "appointments", element: <Appointments /> },
       { path: "news", element: <News /> },
       { path: "doctordashboard", element: <DoctorDashboard /> },
-      { path: "blogs", element: <BlogApp /> },
+      // { path: "blogs", element: <BlogApp /> },
       { path: "prediction-history", element: <PredictionHistory /> }
     ]
   },
@@ -64,6 +67,15 @@ const router = createBrowserRouter([
       { path: "approved-appointments", element: <ApprovedAppointments /> },  
     ]
   },
+  // ✅ NEW: Add this route
+  {
+    path: "/doctor/:id",
+    element: (
+      <ProtectedRoute allowedRoles={['patient']}>
+        <DoctorDetails />
+      </ProtectedRoute>
+    )
+  },
   { path: "*", element: <Login /> } // Redirects unknown routes to login
 ]);
 
@@ -79,7 +91,7 @@ const App = () => {
 const AppStyled = styled.div`
   height: 100vh;
   // background-image: url(${(props) => props.bg});
-  background: rgba(254, 254, 254, 0.25);
+  background: rgba(255, 255, 255, 0.25);
   position: relative;
   main {
     flex: 1;
@@ -91,6 +103,9 @@ const AppStyled = styled.div`
     &::-webkit-scrollbar {
       width: 0;
     }
+  }
+    @media (max-width: 768px) {
+    padding: 0.5rem;
   }
 `;
 

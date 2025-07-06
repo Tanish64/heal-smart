@@ -1,5 +1,37 @@
 import AppointmentModel from "../models/AppointmentModel.js"; // Assuming you have an AppointmentModel
 
+
+// Create a new appointment request (patient)
+export const requestAppointment = async (req, res) => {
+  try {
+    const {
+      doctorId,
+      patientName,
+      age,
+      contact,
+      symptoms,
+      preferredTime,
+    } = req.body;
+
+    const appointment = new AppointmentModel({
+      doctorId,
+      patientName,
+      age,
+      contact,
+      symptoms,
+      preferredTime,
+    });
+
+    await appointment.save();
+    res.status(201).json({ message: "Appointment requested", appointment });
+  } catch (error) {
+    console.error("❌ Error requesting appointment:", error);
+    res.status(500).json({ message: "Failed to request appointment" });
+  }
+};
+
+
+
 // Fetch Pending Appointments for the logged-in doctor
 export const getPendingAppointments = async (req, res) => {
     try {

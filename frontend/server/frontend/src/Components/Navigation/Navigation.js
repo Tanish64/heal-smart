@@ -15,6 +15,24 @@ function Navigation({ active, setActive }) {
     }
   }, [location.pathname, setActive]);
 
+  const handleNearbyHospitals = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const url = `https://www.google.com/maps/search/hospitals/@${latitude},${longitude},14z`;
+          window.open(url, '_blank');
+        },
+        (error) => {
+          alert('Allow location access to find nearby hospitals.');
+          console.error('Geolocation error:', error);
+        }
+      );
+    } else {
+      alert('Geolocation not supported by your browser.');
+    }
+  };
+
   return (
     <NavStyled>
       <div className="user-con">
@@ -28,7 +46,14 @@ function Navigation({ active, setActive }) {
           <li key={item.id} tabIndex={0}>
             <Link
               to={item.link}
-              onClick={() => active !== item.id && setActive && setActive(item.id)}
+              onClick={() => {
+                if (active !== item.id && setActive) {
+                  setActive(item.id);
+                }
+                if (item.action === 'findNearbyHospitals') {
+                  handleNearbyHospitals();
+                }
+              }}
               className={active === item.id ? 'active' : ''}
               aria-current={active === item.id ? 'page' : undefined}
             >

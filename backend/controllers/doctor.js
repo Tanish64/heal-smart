@@ -1,9 +1,10 @@
-import Doctor from "../models/doctorModel.js";
+// controllers/doctor.js
+import User from "../models/user.js";
 
+// ✅ Fetch all doctors (for patient browsing)
 export const getAllDoctors = async (req, res) => {
   try {
-    // Fetch all doctors, excluding sensitive fields like password
-    const doctors = await Doctor.find({}, "-password -doctorCode");
+    const doctors = await User.find({ role: "doctor" }).select("-password");
     res.json(doctors);
   } catch (error) {
     console.error("❌ Failed to fetch doctors:", error);
@@ -11,13 +12,21 @@ export const getAllDoctors = async (req, res) => {
   }
 };
 
+// ✅ Fetch doctor details by ID (used in dashboard)
 export const getDoctorDetails = async (doctorId) => {
   try {
-    const doctor = await Doctor.findOne({ userId: doctorId }).lean();
-    if (!doctor) {
+    const doctor = await User.findById(doctorId).lean();
+    if (!doctor || doctor.role !== "doctor") {
       throw new Error("Doctor not found");
     }
-    return doctor;
+    return {
+      _id: doctor._id,
+      name: doctor.name,
+      email: doctor.email,
+      specialization: doctor.specialization,
+      contact: doctor.contact,
+      imageUri: doctor.imageUri,
+    };
   } catch (error) {
     console.error("Failed to fetch doctor details:", error);
     throw error;
