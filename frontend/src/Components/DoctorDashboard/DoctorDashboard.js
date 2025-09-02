@@ -89,14 +89,14 @@ const HeroSection = styled.div`
     }
     h1 {
       font-size: 2.8rem;
-      color: #2D3748;
+      color: rgb(74, 36, 165);
       margin-bottom: 1.5rem;
       font-weight: 700;
       line-height: 1.2;
     }
     p {
-      font-size: 1.1rem;
-      color: #1A202C;
+      font-size: 1.3rem;
+      color: #0e0e0fff;
       line-height: 1.6;
       max-width: 600px;
     }
@@ -151,8 +151,8 @@ const Card = styled.div`
   }
 
   p {
-    color: #2D3748;
-    font-size: 1rem;
+    color: #131314ff;
+    font-size: 1.3rem;
     line-height: 1.5;
   }
 

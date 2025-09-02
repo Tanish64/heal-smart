@@ -94,7 +94,7 @@ const Login = () => {
             <div className="container">
                 <div className="left-section">
                     <div className="hero-content">
-                        <h1>Welcome Back to Heal Smart</h1>
+                        <h1>Welcome Back to SymptoCare</h1>
                         <p>Your trusted healthcare companion</p>
                         <img src={hero} alt="Healthcare illustration" />
                     </div>

@@ -10,11 +10,11 @@ const LandingPage = () => {
     <LandingWrapper>
       <LandingCard>
         <div className="text-section">
-          <h3>Heal Smart:</h3>
+          <h3>SymptoCare:</h3>
           <h1>Take Charge of Your Health,<br />Mind & Body</h1>
           <p className="tagline">
             Your wellbeing deserves more than guesses — it deserves smart, compassionate care. <br />
-            <span className="highlight">HealSmart</span> uses intelligent tools to guide your journey to health.
+            <span className="highlight">SymptoCare</span> uses intelligent tools to guide your journey to health.
           </p>
           <button onClick={() => navigate('/login')}>Get Started</button>
         </div>

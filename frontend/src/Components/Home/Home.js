@@ -22,7 +22,7 @@ function Home() {
       <div className="content-container">
         <HeroSection>
           <div className="hero-text">
-            <h3>Heal Smart:</h3>
+            <h3>SymptoCare:</h3>
             <h1>Take Charge of Your Health, Mind & Body</h1>
             <p>Feeling under the weather and not sure what's wrong? Don't worry, HealSmart is here to be your friendly health detective!</p>
           </div>

@@ -37,8 +37,8 @@ function Navigation({ active, setActive }) {
     <NavStyled>
       <div className="user-con">
         <Link to="/dashboard/home" className="logo">
-          <img src={avatar} alt="HealSmart Logo" />
-          <h2>HealSmart</h2>
+          <img src={avatar} alt="SymptoCare Logo" />
+          <h2>SymptoCare</h2>
         </Link>
       </div>
       <ul className="menu-items">

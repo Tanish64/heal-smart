@@ -90,12 +90,13 @@ const App = () => {
 
 const AppStyled = styled.div`
   height: 100vh;
-  // background-image: url(${(props) => props.bg});
+  background-image: url(${(props) => props.bg});
   background: rgba(255, 255, 255, 0.25);
   position: relative;
   main {
     flex: 1;
-    background: rgba(252, 246, 249, 0.78);
+    
+    // background: rgba(252, 246, 249, 0.78);
     border: 3px solidrgb(253, 253, 253);
     backdrop-filter: blur(4.5px);
     border-radius: 32px;

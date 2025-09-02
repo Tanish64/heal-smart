@@ -20,8 +20,8 @@ function DoctorNavigation({ active, setActive }) {
     <NavStyled>
       <div className="user-con">
         <Link to="/doctordashboard" className="logo">
-          <img src={avatar} alt="HealSmart Doctor" />
-          <h2>Doctor Panel</h2>
+          <img src={avatar} alt="SymptoCare Doctor" />
+          <h2>SymptoCare</h2>
         </Link>
       </div>
       <ul className="menu-items">

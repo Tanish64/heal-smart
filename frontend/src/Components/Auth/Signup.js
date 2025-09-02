@@ -136,7 +136,7 @@ const Signup = () => {
             <div className="container">
                 <div className="left-section">
                     <div className="hero-content">
-                        <h1>Join Heal Smart</h1>
+                        <h1>Join SymptoCare</h1>
                         <p>Your journey to better healthcare starts here</p>
                         <img src={hero} alt="Healthcare illustration" />
                     </div>
