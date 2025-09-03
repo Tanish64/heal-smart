@@ -1,4 +1,4 @@
-# Heal-Smart 🏥💡
+# symptocare 🏥💡
 
 **Heal-Smart** is an AI-powered healthcare assistant web application that enables users to manage doctor appointments, analyze symptoms using a trained ML model, and access personalized dashboards. It also features a dedicated doctor portal to manage patient requests efficiently.
 
@@ -39,10 +39,7 @@
 - Enter symptoms (e.g., headache, fever)
 - Backend connects to ML API for predictions
 
-### 📝 (Optional) Health Blog
-- View and comment on blog posts
-- Like blog posts
-- Authenticated users can create blogs
+
 
 ---
 
@@ -68,7 +65,7 @@
 
 ## 🗂 Folder Structure
 
-Heal-Smart/
+symptocare/
 ├── backend/ # Node + Express server
 ├── frontend/ # React client
 ├── ml-api/ # Python Flask ML microservice
@@ -152,9 +149,9 @@ screenshots/
 ├── symptom_input.png
 ├── result.png
 🙌 Credits
-💻 Developed by: [Your Name]
+💻 Developed by: Tanish
 
-💡 AI Model by: [Your Name or Model Info]
+💡 AI Model by: Tanish
 
 📚 Data & Inspiration: Real-world healthcare scenarios
 
