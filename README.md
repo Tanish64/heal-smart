@@ -1,6 +1,6 @@
 # symptocare 🏥💡
 
-**Heal-Smart** is an AI-powered healthcare assistant web application that enables users to manage doctor appointments, analyze symptoms using a trained ML model, and access personalized dashboards. It also features a dedicated doctor portal to manage patient requests efficiently.
+**symptocare** is an AI-powered healthcare assistant web application that enables users to manage doctor appointments, analyze symptoms using a trained ML model, and access personalized dashboards. It also features a dedicated doctor portal to manage patient requests efficiently.
 
 ---
 
@@ -8,7 +8,7 @@
 
 | Login Page | Signup Page |
 |------------|-------------|
-| ![Login](./screenshots/login.png) | ![Signup](./screenshots/signup.png) |
+| ![Login](../screenshots/login.pn) | ![Signup](./screenshots/signup.png) |
 
 | Dashboard | Appointments |
 |-----------|--------------|
